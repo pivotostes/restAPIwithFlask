@@ -238,3 +238,4 @@ dmypy.json
 !.vscode/extensions.json
 
 # End of https://www.toptal.com/developers/gitignore/api/flask,python,vscode,git,visualstudiocode
+.vscode/launch.json

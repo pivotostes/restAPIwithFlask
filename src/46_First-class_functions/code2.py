@@ -1,5 +1,6 @@
 from operator import itemgetter
 
+
 def search(sequence, expected, finder):
     for elemen in sequence:
         if finder(elemen) == expected:

@@ -2,6 +2,7 @@
     "python.languageServer": "Pylance",
     "python.analysis.autoSearchPaths": true,
     "python.analysis.extraPaths": [
-        "src/66_Flask_RESTful_app/code"
+        "src/Section4/code",
+        "src/Section5/code",
     ]
 }

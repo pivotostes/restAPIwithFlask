@@ -2,7 +2,7 @@
     "python.languageServer": "Pylance",
     "python.analysis.autoSearchPaths": true,
     "python.analysis.extraPaths": [
-        "src/Section4/code",
+        "src/Section/code",
         "src/Section5/code",
     ]
 }

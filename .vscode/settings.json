@@ -3,6 +3,6 @@
     "python.analysis.autoSearchPaths": true,
     "python.analysis.extraPaths": [
         "src/Section/code",
-        "src/Section5/code",
+        "src/Section6/code",
     ]
 }

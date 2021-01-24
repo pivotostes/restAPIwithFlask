@@ -1,6 +1,16 @@
-import sqlite3
+from flask_sqlalchemy import SQLAlchemy
+from config import app_config, app_active
 
-class ItemModel:
+config = app_config[app_active]
+db = SQLAlchemy(config.APP)
+
+class ItemModel(db.Model):
+    __tablename__ = 'items'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    price = db.Column(db.Float(precision=2), nullable=False)
+
     def __init__(self, name, price) -> None:
         self.name = name
         self.price = price
@@ -10,33 +20,12 @@ class ItemModel:
 
     @classmethod
     def find_by_name(cls, name):
-        connection = sqlite3.connect("database.db")
-        cursor = connection.cursor()
+        return cls.query.filter_by(name=name).first()
 
-        query = "SELECT * FROM items WHERE name=?"
-        result = cursor.execute(query, (name,))
-        row = result.fetchone()
-        connection.close()
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
 
-        if row:
-            return cls(row[1], row[2])
-
-    def insert(self):
-        connection = sqlite3.connect("database.db")
-        cursor = connection.cursor()
-
-        query = "INSERT INTO items VALUES (NULL, ?, ?)"
-        cursor.execute(query, (self.name, self.price))
-
-        connection.commit()
-        connection.close()
-
-    def update(self):
-        connection = sqlite3.connect("database.db")
-        cursor = connection.cursor()
-
-        query = "UPDATE items SET price=? WHERE name=?"
-        cursor.execute(query, (self.price, self.name))
-
-        connection.commit()
-        connection.close()
+    def delete_from_db(self):
+        db.session.delete(self)
+        db.session.commit()

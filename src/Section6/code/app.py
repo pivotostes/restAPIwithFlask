@@ -5,33 +5,35 @@ from flask_sqlalchemy import SQLAlchemy
 from config import app_active, app_config
 from resources.user import UserRegister
 from resources.item import Item, ItemList
+from resources.store import Store, StoreList
 from security import authenticate, identity
 
 config = app_config[app_active]
 
+app = Flask(__name__)
+config.APP = app
 
-def create_app(config_name):
-    app = Flask(__name__)
+config.APP.secret_key = config.SECRET
+config.APP.config.from_object(config)
+config.APP.config.from_pyfile('config.py')
+config.APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-    app.secret_key = config.SECRET
-    app.config.from_object(app_config[config_name])
-    app.config.from_pyfile('config.py')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
+api = Api(app)
 
-    @app.before_first_request
-    def create_tables():
-        db.create_all()
+jwt = JWT(app, authenticate, identity) # creates endpoint /auth
 
-    db = SQLAlchemy(config.APP)
+api.add_resource(Store, '/store/<string:name>')
+api.add_resource(Item, '/item/<string:name>')
+api.add_resource(ItemList, '/items')
+api.add_resource(StoreList, '/stores')
+
+api.add_resource(UserRegister, '/register')
+
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
+if __name__ == '__main__':
+    from db import db
     db.init_app(app)
-
-    api = Api(app)
-
-    jwt = JWT(app, authenticate, identity) # creates endpoint /auth
-
-    api.add_resource(Item, '/item/<string:name>')
-    api.add_resource(ItemList, '/items')
-    api.add_resource(UserRegister, '/register')
-
-    app.run(port=5000, debug=True)
+    config.APP.run(host=config.IP_HOST, port=config.PORT_HOST)

@@ -1,16 +1,12 @@
-import sqlite3
-from flask_sqlalchemy import SQLAlchemy
-from config import app_config, app_active
+from db import db
 
-config = app_config[app_active]
-db = SQLAlchemy(config.APP)
+
 class UserModel(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
-
 
     def __init__(self, username, password) -> None:
         self.username = username

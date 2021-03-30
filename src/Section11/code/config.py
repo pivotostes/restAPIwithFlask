@@ -30,7 +30,7 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     TESTING = False
     DEBUG = False
-    IP_HOST = 'localhost'
+    IP_HOST = '192.168.0.121'
     # Aqui geralmente é um IP de um servidor na nuvem e
     # não o endereço da máquina local
     PORT_HOST = 8080

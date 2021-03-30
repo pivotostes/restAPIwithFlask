@@ -1,10 +1,11 @@
 from operator import ne
-from flask_jwt_extended.utils import get_jwt_header
 from flask_jwt_extended.view_decorators import jwt_required
+from jwt import encode
 from models.user import UserModel
 from flask_restful import Resource, reqparse
 from werkzeug.security import safe_str_cmp
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, get_jwt
+from resources.blocklist import BLOCKLIST
 
 
 _user_parser = reqparse.RequestParser()
@@ -19,6 +20,7 @@ _user_parser.add_argument('password',
                          help="This field cannot be blank."
                          )
 
+
 class UserRegister(Resource):
 
     def post(self):
@@ -31,6 +33,7 @@ class UserRegister(Resource):
         user.save_to_db()
 
         return {"message": "User created successfully."}, 201
+
 
 class User(Resource):
     @classmethod
@@ -48,11 +51,13 @@ class User(Resource):
         user.delete_from_db()
         return {'message': 'User deleted'}, 200
 
+
 class UserList(Resource):
     classmethod
     def get(cls):
         users = {'users': list(map(lambda x: x.json(), UserModel.query.all()))}
         return users
+
 
 class UserLogin(Resource):
     def post(self):
@@ -70,6 +75,17 @@ class UserLogin(Resource):
                 'refresh_token': refresh_token
             }, 200
         return {'message': 'Invalid credentials.'}, 401
+
+
+class UserLogout(Resource):
+    @jwt_required()
+    def post(self):
+        jti = get_jwt()['jti']
+        BLOCKLIST.add(jti)
+        return {
+            'message': 'Successfully logged out.'
+        }, 200
+
 
 class TokenRefresh(Resource):
     @jwt_required(refresh=True)

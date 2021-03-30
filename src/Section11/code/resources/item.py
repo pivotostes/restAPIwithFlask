@@ -57,10 +57,11 @@ class Item(Resource):
 
         item = ItemModel.find_by_name(name)
 
-        if item is None:
-            item = ItemModel(name, **data)
-        else:
+        if item:
             item.price = data['price']
+            item.store_id = data['store_id']
+        else:
+            item = ItemModel(name, **data)
 
         item.save_to_db()
 
@@ -71,7 +72,7 @@ class ItemList(Resource):
     @jwt_required(optional=True)
     def get(self):
         user_id = get_jwt_identity()
-        items = list(map(lambda item: item.json(), ItemModel.query.all()))
+        items = [item.json() for item in ItemModel.find_all()]
         if user_id:
             return {'items': items }, 200
         return {
